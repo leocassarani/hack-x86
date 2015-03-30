@@ -18,5 +18,11 @@ void kmain(void)
     // Enable VBE in Linear Frame Buffer (LFB) mode.
     vbe_write(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
 
+    unsigned i = 0;
+    char *vidptr = (char *)VBE_DISPI_LFB_PHYSICAL_ADDRESS;
+
+    while (i < XRES * YRES)
+        vidptr[i++] = 0x3f; // White = 0b00001111
+
     return;
 }
