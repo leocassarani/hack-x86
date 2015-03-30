@@ -1,26 +1,22 @@
+#include "vbe.h"
+
+#define XRES 512
+#define YRES 256
+
 void kmain(void)
-  {
-      const char *str = "my first kernel";
-      char *vidptr = (char *)0xb8000;
-      unsigned int i = 0;
-      unsigned int j = 0;
+{
+    vbe_write(VBE_DISPI_INDEX_ID, VBE_DISPI_ID3);
+    vbe_write(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
 
-      while (j < 80 * 25 * 2)
-        {
-          vidptr[j] = ' ';
-          vidptr[j+1] = 0x07;
-          j = j + 2;
-        }
+    // Set X and Y resolution.
+    vbe_write(VBE_DISPI_INDEX_XRES, XRES);
+    vbe_write(VBE_DISPI_INDEX_YRES, YRES);
 
-    j = 0;
+    // Use 8 BPP for simplicity: each pixel is exactly one byte.
+    vbe_write(VBE_DISPI_INDEX_BPP, VBE_DISPI_BPP_8);
 
-    while (str[j] != '\0')
-      {
-        vidptr[i] = str[j];
-        vidptr[i+1] = 0x07;
-        ++j;
-        i = i + 2;
-      }
+    // Enable VBE in Linear Frame Buffer (LFB) mode.
+    vbe_write(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
 
     return;
-  }
+}
