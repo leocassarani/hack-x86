@@ -1,3 +1,6 @@
+#ifndef __VBE_H
+#define __VBE_H
+
 #define VBE_DISPI_TOTAL_VIDEO_MEMORY_MB 4
 #define VBE_DISPI_BANK_ADDRESS          0xA0000
 #define VBE_DISPI_BANK_SIZE_KB          64
@@ -40,7 +43,9 @@
 
 #define VBE_DISPI_LFB_PHYSICAL_ADDRESS  0xFD000000
 
-typedef unsigned short uint16_t;
+#include "stdint.h"
 
 uint16_t vbe_read(uint16_t index);
 void vbe_write(uint16_t index, uint16_t data);
+
+#endif
