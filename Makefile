@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-OBJECTS = kernel.o vbe.o pci.o loader.o
+OBJECTS = kernel.o vbe.o pci.o loader.o hack.o
 
 all: kernel
 
