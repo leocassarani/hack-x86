@@ -1,4 +1,5 @@
 #include "hack.h"
+#include "screen.h"
 #include "stdbool.h"
 
 #define I_MASK  (1 << 15)
@@ -16,6 +17,7 @@
 #define J2_MASK (1 << 1)
 #define J3_MASK (1)
 
+#define MSB_MASK    (1 << 15)
 #define RAM_MASK    (1 << 14)
 #define SCREEN_MASK (1 << 13)
 
@@ -24,6 +26,7 @@ static void execute_A_inst(struct hack_computer *comp, uint16_t inst);
 
 static uint16_t memory_get(struct hack_memory *memory, uint16_t addr);
 static void memory_set(struct hack_memory *memory, uint16_t addr, uint16_t value);
+static void screen_repaint(uint16_t *screen, uint16_t addr, uint16_t value);
 
 struct alu_result {
     uint16_t output;
@@ -117,11 +120,38 @@ static uint16_t memory_get(struct hack_memory *memory, uint16_t addr)
     if (~addr & RAM_MASK)
         return memory->ram[addr];
 
+    if (~addr & SCREEN_MASK)
+    {
+        addr = addr & (RAM_MASK - 1);
+        return memory->screen[addr];
+    }
+
     return 0;
 }
 
 static void memory_set(struct hack_memory *memory, uint16_t addr, uint16_t value)
 {
     if (~addr & RAM_MASK)
+    {
         memory->ram[addr] = value;
+    }
+    else if (~addr & SCREEN_MASK)
+    {
+        addr = addr & (RAM_MASK - 1);
+        memory->screen[addr] = value;
+        screen_repaint(memory->screen, addr, value);
+    }
+}
+
+static void screen_repaint(uint16_t *screen, uint16_t addr, uint16_t value)
+{
+    unsigned offset = 16 * addr;
+    uint8_t color;
+    unsigned i = 0;
+
+    for (; i < 16; i++)
+    {
+        color = (value & (1 << i)) ? 0x00 : 0x3f;
+        screen_set_color(offset + i, color);
+    }
 }

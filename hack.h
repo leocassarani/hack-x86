@@ -11,6 +11,7 @@ struct hack_computer {
 
 struct hack_memory {
   uint16_t *ram;
+  uint16_t *screen;
 };
 
 void hack_init(struct hack_computer *comp, struct hack_memory *memory, uint16_t *program);
