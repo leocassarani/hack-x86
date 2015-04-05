@@ -1,11 +1,11 @@
-.PHONY: all clean
-
 OBJECTS = kernel.o hack.o loader.o pci.o screen.o vbe.o
 
-all: kernel
+.PHONY: all clean
 
-kernel: link.ld $(OBJECTS)
-	ld -T link.ld -m elf_i386 -o kernel $(OBJECTS)
+all: kernel.elf
+
+kernel.elf: link.ld $(OBJECTS)
+	ld -T link.ld -m elf_i386 -o kernel.elf $(OBJECTS)
 
 %.o: %.c
 	gcc -m32 -c $< -o $@
@@ -14,4 +14,4 @@ kernel: link.ld $(OBJECTS)
 	nasm -f elf32 $< -o $@
 
 clean:
-	rm -f kernel $(OBJECTS)
+	rm -f kernel.elf $(OBJECTS)
