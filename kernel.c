@@ -1,4 +1,5 @@
 #include "hack.h"
+#include "intr.h"
 #include "program.h"
 #include "screen.h"
 #include "stdint.h"
@@ -12,6 +13,7 @@ static uint16_t hack_screen[SCREEN_SIZE];
 void kmain(void)
 {
     screen_init();
+    intr_init();
 
     struct hack_memory memory = {
         .ram = hack_ram,
