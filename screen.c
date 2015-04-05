@@ -6,6 +6,9 @@
 #define XRES 512
 #define YRES 256
 
+/* Base address of the memory-mapped screen. */
+static uint8_t *screen_ptr;
+
 static void screen_clear(void);
 
 void screen_init(void)
