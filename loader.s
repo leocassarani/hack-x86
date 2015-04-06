@@ -1,6 +1,7 @@
 bits 32
 
 global loader
+global keyboard_intr_handler
 
 MAGIC_NUMBER equ 0x1BADB002
 FLAGS        equ 0x00
@@ -13,12 +14,17 @@ align 4
   dd CHECKSUM
 
 extern kmain
+extern keyboard_handler
 
 loader:
   cli
   mov esp, stack_space
   call kmain
   hlt
+
+keyboard_intr_handler:
+  call keyboard_handler
+  iret
 
 section .bss
 resb 8192

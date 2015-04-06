@@ -1,4 +1,5 @@
 #include "hack.h"
+#include "keyboard.h"
 #include "screen.h"
 #include "stdbool.h"
 
@@ -25,6 +26,8 @@ static void execute_C_inst(struct hack_computer *comp, uint16_t inst);
 static void execute_A_inst(struct hack_computer *comp, uint16_t inst);
 
 static uint16_t memory_get(struct hack_memory *memory, uint16_t addr);
+static uint16_t memory_keyboard_get(uint16_t addr);
+
 static void memory_set(struct hack_memory *memory, uint16_t addr, uint16_t value);
 static void screen_repaint(uint16_t *screen, uint16_t addr, uint16_t value);
 
@@ -109,24 +112,37 @@ static void alu_compute(struct alu_result *result, uint16_t x, uint16_t y, uint1
     if (inst & C6_MASK)
         result->output = ~(result->output);
 
-    result->zero = 0 == result->output;
+    result->zero = result->output == 0;
     result->negative = result->output & (1 << 15);
     result->positive = !result->zero && !result->negative;
 }
 
-
 static uint16_t memory_get(struct hack_memory *memory, uint16_t addr)
 {
     if (~addr & RAM_MASK)
+    {
         return memory->ram[addr];
-
-    if (~addr & SCREEN_MASK)
+    }
+    else if (~addr & SCREEN_MASK)
     {
         addr = addr & (RAM_MASK - 1);
         return memory->screen[addr];
     }
+    else
+    {
+        addr = addr & (SCREEN_MASK - 1);
+        return memory_keyboard_get(addr);
+    }
+}
 
-    return 0;
+static uint16_t memory_keyboard_get(uint16_t addr)
+{
+    // The keyboard memory map is limited to a single memory address,
+    // so we ignore any attempts to fetch any address beyond the first.
+    if (addr > 0)
+        return 0;
+
+    return (uint16_t)keyboard_get_current_char();
 }
 
 static void memory_set(struct hack_memory *memory, uint16_t addr, uint16_t value)
@@ -141,6 +157,9 @@ static void memory_set(struct hack_memory *memory, uint16_t addr, uint16_t value
         memory->screen[addr] = value;
         screen_repaint(memory->screen, addr, value);
     }
+
+    // We don't support writing to the keyboard memory map, so if the
+    // address exceeds the bounds of the screen, we silently drop it.
 }
 
 static void screen_repaint(uint16_t *screen, uint16_t addr, uint16_t value)

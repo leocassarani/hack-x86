@@ -1,4 +1,4 @@
-OBJECTS = kernel.o hack.o intr.o loader.o pci.o screen.o vbe.o
+OBJECTS = kernel.o hack.o intr.o keyboard.o loader.o pci.o screen.o vbe.o
 
 .PHONY: all clean
 
